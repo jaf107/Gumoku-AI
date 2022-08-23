@@ -105,21 +105,12 @@ class Board:
 
     def draw(self, move, is_black):
         if is_black:
-            color = 2
+            color = Player.BLACK
         else:
-            color = 1
+            color = Player.WHITE
         
         self.matrix[move] = color
 
-    def swap(self):
-        board = Board(matrix=self.matrix)
-        for i in range(board.size):
-            for j in range(board.size):
-                if board.matrix[i][j] == 1:
-                    board.matrix[i][j] = 2
-                elif board.matrix[i][j] == 2:
-                    board.matrix[i][j] = 1
-        return board
 
 
 class Engine:
@@ -230,11 +221,9 @@ class Engine:
         return score
 
     @classmethod
-    def find_next_move(cls, board: Board, depth, is_black):
+    def find_next_move(cls, board: Board, depth):
         cls.evaluation_count = 0
         cls.calculation_time = 0
-        if is_black:
-            board = board.swap() # not needed
 
         start = time.time()
         
@@ -283,11 +272,11 @@ class Engine:
 
         best_move = None
 
-        if is_max:
+        if is_max: # Max Node
             best_value = -math.inf
             for move in all_possible_moves:
                 dumm_board = Board(board=board)
-                dumm_board.draw(move, False)
+                dumm_board.draw(move, False) # 
                 value, temp_move = cls.minimax_alphabeta(dumm_board, depth-1, alpha, beta, not is_max)
                 if value > alpha:
                     alpha = value
@@ -296,7 +285,7 @@ class Engine:
                 if value > best_value:
                     best_value = value
                     best_move = move
-        else:
+        else: # Min Node
             best_value = math.inf
             for move in all_possible_moves:
                 dumm_board = Board(board=board)
@@ -317,11 +306,11 @@ class Engine:
 
         for move in all_possible_moves:
             dumm_board = Board(board=board)
-            dumm_board.draw(move, False)
+            dumm_board.draw(move, False) # False returns not black
             if dumm_board.check_win(1):
                 return (None, move)
             dumm_board = Board(board=board)
-            dumm_board.draw(move, True)
+            dumm_board.draw(move, True) # True returns is_black
             if dumm_board.check_win(2):
                 return (None, move)
         return (None, None)
@@ -356,9 +345,8 @@ class Game:
             self.set_piece(row, col)
         self.black_turn = not self.black_turn
 
-    def ai_play(self, player):
-        is_black = player == 2
-        row, col = Engine.find_next_move(self.board, 3, is_black)
+    def ai_play(self):
+        row, col = Engine.find_next_move(self.board, 3)
         self.set_piece(row, col)
         self.black_turn = not self.black_turn
 
@@ -417,11 +405,9 @@ class Game:
 
 
 class GomokuUI():
-    PVP = 0
-    PVC = 1
-    CVC = 2
+    
 
-    def __init__(self, name="Gomoku", size=12, mode=1):
+    def __init__(self, name="Gomoku", size=12 ):
         pygame.init()
         pygame.display.set_caption(name)
         self.width = 30 * size + 30
@@ -430,7 +416,7 @@ class GomokuUI():
         self.font = pygame.font.SysFont("arial", 24)
         board = Board(size=size)
 
-        self.mode = mode
+        # self.mode = mode
         self.going = True
         self.clock = pygame.time.Clock()
         self.game = Game(board)
@@ -439,7 +425,7 @@ class GomokuUI():
         while self.going:
             self.update()
             self.draw()
-            self.clock.tick(60)
+            # self.clock.tick(60)
 
         pygame.quit()
 
@@ -455,33 +441,26 @@ class GomokuUI():
         if self.game.game_over:
             return
 
-        if self.mode == self.PVC:
-            if self.game.black_turn:
-                self.handle_event()
-            else:
-                self.handle_event()
-                self.game.ai_play(Player.WHITE)
+        # Player Vs Computer mode always
 
-        elif self.mode == self.PVP:
+        if self.game.black_turn: 
+            # Player move - (User Input)
             self.handle_event()
+        else:
+            # Computer move
+            self.game.ai_play()
 
-        elif self.mode == self.CVC:
-            self.handle_event()
-            if self.game.black_turn:
-                self.game.ai_play(Player.BLACK)
-            else:
-                self.game.ai_play(Player.WHITE)
         
         self.game.black_score = Engine.get_score(self.game.board, True, not self.game.black_turn)
         self.game.white_score = Engine.get_score(self.game.board, False, not self.game.black_turn)
 
     def draw(self):
         self.screen.fill((255, 255, 255))
-        self.screen.blit(self.font.render("FPS: {0:.2F}".format(self.clock.get_fps()), True, (0, 0, 0)), (10, 10))
-        self.screen.blit(self.font.render("Black: {0}".format(self.game.black_score), True, (0, 0, 0)), (10, self.height - 25))
-        self.screen.blit(self.font.render("White: {0}".format(self.game.white_score), True, (0, 0, 0)), (10, self.height - 50))
-        self.screen.blit(self.font.render("Calculation time: {0:0.2f}s".format(Engine.calculation_time), True, (0, 0, 0)), (10, self.height - 75))
-        self.screen.blit(self.font.render("Number of calculations: {0}".format(Engine.evaluation_count), True, (0, 0, 0)), (10, self.height - 100))
+        # self.screen.blit(self.font.render("FPS: {0:.2F}".format(self.clock.get_fps()), True, (0, 0, 0)), (10, 10))
+        # self.screen.blit(self.font.render("Black: {0}".format(self.game.black_score), True, (0, 0, 0)), (10, self.height - 25))
+        # self.screen.blit(self.font.render("White: {0}".format(self.game.white_score), True, (0, 0, 0)), (10, self.height - 50))
+        # self.screen.blit(self.font.render("Calculation time: {0:0.2f}s".format(Engine.calculation_time), True, (0, 0, 0)), (10, self.height - 75))
+        # self.screen.blit(self.font.render("Number of calculations: {0}".format(Engine.evaluation_count), True, (0, 0, 0)), (10, self.height - 100))
         self.screen.blit(self.font.render("Turn: {0}".format("Black" if self.game.black_turn else "White"), True, (0, 0, 0)), (10, self.height - 125))
 
         self.game.draw(self.screen)
@@ -492,5 +471,5 @@ class GomokuUI():
 
 
 if __name__ == '__main__':
-    game = GomokuUI("Gomoku", 12, GomokuUI.PVC)
+    game = GomokuUI("Gomoku", 12)
     game.loop()
