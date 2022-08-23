@@ -253,6 +253,8 @@ class Engine:
             move = (board.size//2, board.size//2)
         return move
 
+
+    # NEED TO BE UNDERSTOOD
     @classmethod
     def heuristic_sort(cls, board, all_moves):
         def my_func(board, move):
