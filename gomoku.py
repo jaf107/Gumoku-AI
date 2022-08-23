@@ -6,8 +6,8 @@ import pygame
 
 
 class Player:
-    WHITE = 1
-    BLACK = 2
+    WHITE = 1 # Computer
+    BLACK = 2 # Human
 
 
 class Board:
