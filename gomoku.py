@@ -10,7 +10,7 @@ class Player:
     BLACK = 2 # Human
 
 
-class Board:
+class Board: 
     def __init__(self, board=None, matrix=None, size=None):
         if board is not None:
             self.matrix = np.array(board.matrix)
@@ -186,6 +186,7 @@ class Engine:
     @classmethod
     def get_consecutive_score(cls, pattern_dict):
         score = 0
+        print(pattern_dict)
         for pattern in pattern_dict:
             if pattern.count('X') == 5:
                 if pattern[0] == 'O' and pattern[-1] == 'O':
@@ -370,7 +371,7 @@ class Game:
             self.game_over = True
 
     def draw(self, screen):
-        pygame.draw.rect(screen, (185, 122, 87), [self.start_x - self.edge_size, self.start_y - self.edge_size, (self.board.size - 1)
+        pygame.draw.rect(screen, (205, 128, 0), [self.start_x - self.edge_size, self.start_y - self.edge_size, (self.board.size - 1)
                                                   * self.grid_size + self.edge_size * 2, (self.board.size - 1) * self.grid_size + self.edge_size * 2], 0)
 
         for r in range(self.board.size):
@@ -425,8 +426,6 @@ class GomokuUI():
         while self.going:
             self.update()
             self.draw()
-            # self.clock.tick(60)
-
         pygame.quit()
 
     def handle_event(self): # Mouse input from User
@@ -440,7 +439,6 @@ class GomokuUI():
         self.game.check_win()
         if self.game.game_over:
             return
-
         # Player Vs Computer mode always
 
         if self.game.black_turn: 
@@ -450,17 +448,14 @@ class GomokuUI():
             # Computer move
             self.game.ai_play()
 
-        
         self.game.black_score = Engine.get_score(self.game.board, True, not self.game.black_turn)
         self.game.white_score = Engine.get_score(self.game.board, False, not self.game.black_turn)
 
+    def restartBox():
+        self
+
     def draw(self):
         self.screen.fill((255, 255, 255))
-        # self.screen.blit(self.font.render("FPS: {0:.2F}".format(self.clock.get_fps()), True, (0, 0, 0)), (10, 10))
-        # self.screen.blit(self.font.render("Black: {0}".format(self.game.black_score), True, (0, 0, 0)), (10, self.height - 25))
-        # self.screen.blit(self.font.render("White: {0}".format(self.game.white_score), True, (0, 0, 0)), (10, self.height - 50))
-        # self.screen.blit(self.font.render("Calculation time: {0:0.2f}s".format(Engine.calculation_time), True, (0, 0, 0)), (10, self.height - 75))
-        # self.screen.blit(self.font.render("Number of calculations: {0}".format(Engine.evaluation_count), True, (0, 0, 0)), (10, self.height - 100))
         self.screen.blit(self.font.render("Turn: {0}".format("Black" if self.game.black_turn else "White"), True, (0, 0, 0)), (10, self.height - 125))
 
         self.game.draw(self.screen)
