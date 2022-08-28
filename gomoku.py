@@ -14,8 +14,9 @@ class GomokuUI():
     def __init__(self, name="Gomoku", size=12 ):
         pygame.init()
         pygame.display.set_caption(name)
-        self.width = 30 * size + 30
-        self.height = 30 * size + 30 + 150
+        BLOCKSIZE = 30
+        self.width = BLOCKSIZE * size + BLOCKSIZE
+        self.height = BLOCKSIZE * size + BLOCKSIZE + 150
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.font = pygame.font.SysFont("arial", 24)
         self.board = Board(size=size)
@@ -101,5 +102,5 @@ class GomokuUI():
 
 
 if __name__ == '__main__':
-    game = GomokuUI("Gomoku", 12)
+    game = GomokuUI("Gomoku", 10)
     game.loop()
